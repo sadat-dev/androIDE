@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import dev.sadat.androide.views.EditorView;
 
 
 public class WelcomeScreen extends Activity {
@@ -11,7 +12,8 @@ public class WelcomeScreen extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_welcome_screen);
+        EditorView editor = new EditorView(getApplicationContext());
+        setContentView(editor);
     }
 
     @Override
