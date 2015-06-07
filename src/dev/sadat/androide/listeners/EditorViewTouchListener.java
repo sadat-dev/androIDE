@@ -1,7 +1,8 @@
 package dev.sadat.androide.listeners;
 
+import android.text.method.MovementMethod;
+import android.util.Log;
 import android.view.MotionEvent;
-import android.view.MotionEvent.PointerCoords;
 import android.view.View;
 import android.view.View.OnTouchListener;
 
@@ -12,9 +13,13 @@ public class EditorViewTouchListener implements OnTouchListener {
 	private float currX;
 	private float currY;
 
-	private static final float DELTA_THRESHOLD = 2;
+	private static final float DELTA_THRESHOLD = 0.2f;
 
 	private EditorTouchCallback callback;
+
+	public void setTouchCallback(EditorTouchCallback callback) {
+		this.callback = callback;
+	}
 
 	@Override
 	public boolean onTouch(View view, MotionEvent evt) {
@@ -23,7 +28,7 @@ public class EditorViewTouchListener implements OnTouchListener {
 			return handleSinglePointers(evt);
 		} else {
 			return false;
-			//return handleMultiPointers(evt);
+			// return handleMultiPointers(evt);
 		}
 	}
 
@@ -33,20 +38,20 @@ public class EditorViewTouchListener implements OnTouchListener {
 
 		int type = EditorTouchCallback.NO_ACTION;
 
-		switch (evt.getAction()) {
+		switch (evt.getActionMasked()) {
 		case MotionEvent.ACTION_DOWN:
 			type = EditorTouchCallback.TOUCH;
+			prevX = currX;
+			prevY = currY;
 			break;
 		case MotionEvent.ACTION_UP:
 			type = EditorTouchCallback.UNTOUCH;
 			break;
+		case MotionEvent.ACTION_MOVE:
+			type = EditorTouchCallback.TOUCH;
+			break;
 		}
 
-		if (MotionEvent.ACTION_DOWN == evt.getAction()){
-			prevX = currX;
-			prevY = currY;
-		}
-		
 		float deltaX = currX - prevX;
 		float deltaY = currY - prevY;
 
@@ -57,19 +62,8 @@ public class EditorViewTouchListener implements OnTouchListener {
 
 		prevX = currX;
 		prevY = currY;
-
+		
 		return callback.motionEvent(type, deltaX, deltaY);
 	}
-
-	/*private boolean handleMultiPointers(MotionEvent evt) {
-		currX = evt.getX(0);
-		currY = evt.getY(0);
-		// TODO other handling
-
-		prevX = currX;
-		prevY = currY;
-
-		return callback.motionEvent(type, delta);
-	}*/
 
 }

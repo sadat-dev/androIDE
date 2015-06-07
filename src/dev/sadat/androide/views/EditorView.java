@@ -1,17 +1,23 @@
 package dev.sadat.androide.views;
 
+import java.util.Arrays;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import dev.sadat.androide.listeners.EditorTouchCallback;
 import dev.sadat.androide.listeners.EditorViewTouchListener;
 
 public class EditorView extends View implements EditorTouchCallback{
+
+	private static final float SPEED = 1;
 
 	private Context context;
 	
@@ -26,7 +32,7 @@ public class EditorView extends View implements EditorTouchCallback{
 	private Paint backgroundPaint;
 	private Paint gridLinePaint;
 	
-	private Matrix viewMatrix;
+	private float [] delta;
 	
 	
 	public EditorView(Context context) {
@@ -40,7 +46,10 @@ public class EditorView extends View implements EditorTouchCallback{
 	public EditorView(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		this.context = context;
-		this.setOnTouchListener(new EditorViewTouchListener());
+		EditorViewTouchListener listener = new EditorViewTouchListener();
+		listener.setTouchCallback(this);
+		this.setOnTouchListener(listener);
+		delta = new float[]{0,0};
 	}
 	
 	@Override
@@ -48,9 +57,11 @@ public class EditorView extends View implements EditorTouchCallback{
 		// Call Initialization only once
 		if (isInit == false)
 			initialize(canvas);
-		canvas.save();
 		canvas.drawRect(background, backgroundPaint);
 		drawGridLines(canvas);
+		canvas.save();
+		canvas.translate(delta[0], delta[1]);
+		canvas.drawCircle(50, 50, 100, gridLinePaint);
 		canvas.restore();
 	}
 	
@@ -62,8 +73,6 @@ public class EditorView extends View implements EditorTouchCallback{
 	}
 	
 	private void initialize(Canvas canvas){
-		
-		viewMatrix = this.getMatrix();
 		background = new Rect(0, 0, super.getWidth(), super.getHeight());
 		backgroundPaint = new Paint();
 		backgroundPaint.setColor(Color.DKGRAY);
@@ -83,8 +92,11 @@ public class EditorView extends View implements EditorTouchCallback{
 
 	@Override
 	public boolean motionEvent(int type, float deltaX, float deltaY) {
-		if (type == EditorTouchCallback.SCROLL)
-			viewMatrix.setTranslate(deltaX, deltaY);
+		if (type == EditorTouchCallback.SCROLL){
+			delta[0] += deltaX*SPEED;
+			delta[1] += deltaY*SPEED;
+			invalidate();
+		}
 		return true;
 	}
 
