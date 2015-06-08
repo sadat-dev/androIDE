@@ -1,5 +1,6 @@
 package dev.sadat.androide.listeners;
 
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -12,8 +13,6 @@ public class EditorViewTouchListener implements OnTouchListener {
 	private float currX;
 	private float currY;
 
-	private static final float DELTA_THRESHOLD = 0.2f;
-
 	private EditorTouchCallback callback;
 
 	public void setTouchCallback(EditorTouchCallback callback) {
@@ -22,6 +21,12 @@ public class EditorViewTouchListener implements OnTouchListener {
 
 	@Override
 	public boolean onTouch(View view, MotionEvent evt) {
+		if (!(view instanceof EditorView)){
+			view.onTouchEvent(evt);
+			return true;
+		}
+		Log.w("EditorViewTouchListener.onTouch", view.getClass().getSimpleName());
+		
 		int numPointers = evt.getPointerCount();
 		if (numPointers < 2) {
 			return handleSinglePointers(evt);
@@ -47,17 +52,12 @@ public class EditorViewTouchListener implements OnTouchListener {
 			type = EditorTouchCallback.UNTOUCH;
 			break;
 		case MotionEvent.ACTION_MOVE:
-			type = EditorTouchCallback.TOUCH;
+			type = EditorTouchCallback.SCROLL;
 			break;
 		}
 
 		float deltaX = currX - prevX;
 		float deltaY = currY - prevY;
-
-		if ((deltaX < DELTA_THRESHOLD || deltaX > DELTA_THRESHOLD) && type == EditorTouchCallback.TOUCH)
-			type = EditorTouchCallback.SCROLL;
-		else if ((deltaY < DELTA_THRESHOLD || deltaY > DELTA_THRESHOLD) && type == EditorTouchCallback.TOUCH)
-			type = EditorTouchCallback.SCROLL;
 
 		prevX = currX;
 		prevY = currY;

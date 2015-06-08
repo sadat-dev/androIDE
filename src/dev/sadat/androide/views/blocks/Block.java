@@ -79,6 +79,10 @@ public class Block extends View implements BlockTouchCallback{
 		headBlock = new Rect(0, 0, textRight + PADDING * 2, textSize + PADDING * 2);
 		backBlock = new Rect(0, 0, textRight + PADDING * 2, textSize * 4 + PADDING * 2);
 	}
+	
+	public float[] getBlockBounds(){
+		return new float[]{backBlock.left+position[0],backBlock.top+position[1],backBlock.right+position[0],backBlock.bottom+position[1]};
+	}
 
 	@Override
 	public boolean onBlockTouched(int type, float deltaX, float deltaY) {

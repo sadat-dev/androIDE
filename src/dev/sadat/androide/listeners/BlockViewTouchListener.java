@@ -1,9 +1,9 @@
 package dev.sadat.androide.listeners;
 
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import dev.sadat.androide.views.EditorView;
 
 public class BlockViewTouchListener implements OnTouchListener {
 
@@ -23,11 +23,7 @@ public class BlockViewTouchListener implements OnTouchListener {
 	
 	@Override
 	public boolean onTouch(View view, MotionEvent evt) {
-		if (!(view instanceof EditorView)) {
-			boolean handled = view.onTouchEvent(evt);
-			if (handled)
-				return true;
-		}
+		Log.w("BlockViewTouchListener.onTouch", view.getClass().getSimpleName());
 		int numPointers = evt.getPointerCount();
 		if (numPointers < 2) {
 			return handleSinglePointers(evt);

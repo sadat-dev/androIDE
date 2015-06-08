@@ -1,5 +1,7 @@
 package dev.sadat.androide.views;
 
+import java.util.ArrayList;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -13,8 +15,6 @@ import dev.sadat.androide.listeners.EditorViewTouchListener;
 import dev.sadat.androide.views.blocks.Block;
 
 public class EditorView extends View implements EditorTouchCallback{
-
-	private static final float SPEED = 1;
 
 	private Context context;
 	
@@ -31,7 +31,9 @@ public class EditorView extends View implements EditorTouchCallback{
 	
 	private float [] delta;
 	
-	private Block[] debug;
+	private ArrayList<View> debug;
+	
+	private EditorViewTouchListener listener;
 	
 	public EditorView(Context context) {
 		this(context, null, 0);
@@ -44,7 +46,7 @@ public class EditorView extends View implements EditorTouchCallback{
 	public EditorView(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		this.context = context;
-		EditorViewTouchListener listener = new EditorViewTouchListener();
+		listener = new EditorViewTouchListener();
 		listener.setTouchCallback(this);
 		this.setOnTouchListener(listener);
 		delta = new float[]{0,0};
@@ -61,7 +63,7 @@ public class EditorView extends View implements EditorTouchCallback{
 		canvas.save();
 		canvas.translate(delta[0], delta[1]);
 		// TODO Code Block Drawing
-		for (Block deb:debug)
+		for (View deb:debug)
 			deb.draw(canvas);
 		canvas.restore();
 	}
@@ -81,10 +83,11 @@ public class EditorView extends View implements EditorTouchCallback{
 		setGridLineConfig();
 		isInit = true;
 		
-		debug = new Block[10];
+		debug = new ArrayList<View>();
 		
-		for (int i=0; i< 10; i++){
-			debug[i] = new Block(context, 20*i, 20);
+		for (int i=0; i< 50; i++){
+			Block block = new Block(context, 100*i, 50 * (i%5));
+			debug.add(block);
 		}
 	}
 	
@@ -100,8 +103,8 @@ public class EditorView extends View implements EditorTouchCallback{
 	@Override
 	public boolean motionEvent(int type, float deltaX, float deltaY) {
 		if (type == EditorTouchCallback.SCROLL){
-			delta[0] += deltaX*SPEED;
-			delta[1] += deltaY*SPEED;
+			delta[0] += deltaX;
+			delta[1] += deltaY;
 			invalidate();
 		}
 		return true;
