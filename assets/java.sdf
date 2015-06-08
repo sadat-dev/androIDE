@@ -1,0 +1,39 @@
+Java
+{
+  modifiers{
+    public
+    private
+    protected
+    
+  }
+  keywords{
+    class
+    extends
+    implements
+    import
+    package
+  }
+  primitives{
+    boolean
+    byte
+    short
+    int
+    long
+    float
+    double
+    char
+  }
+  operators{
+    +
+    -
+    *
+    /
+    >
+    <
+    !
+    >>
+    <<
+    ?
+    :
+  }
+}

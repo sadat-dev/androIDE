@@ -10,7 +10,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import dev.sadat.androide.listeners.EditorTouchCallback;
 import dev.sadat.androide.listeners.EditorViewTouchListener;
-import dev.sadat.androide.views.blocks.Variable;
 
 public class EditorView extends View implements EditorTouchCallback{
 
@@ -31,8 +30,6 @@ public class EditorView extends View implements EditorTouchCallback{
 	
 	private float [] delta;
 	
-	private Variable debug;
-	
 	public EditorView(Context context) {
 		this(context, null, 0);
 	}
@@ -48,8 +45,6 @@ public class EditorView extends View implements EditorTouchCallback{
 		listener.setTouchCallback(this);
 		this.setOnTouchListener(listener);
 		delta = new float[]{0,0};
-		
-		debug = new Variable(20, 20, "String", "testVar", "This is a test");
 	}
 	
 	@SuppressLint("WrongCall")
@@ -63,7 +58,6 @@ public class EditorView extends View implements EditorTouchCallback{
 		canvas.save();
 		canvas.translate(delta[0], delta[1]);
 		// TODO Code Block Drawing
-		debug.onDraw(canvas);
 		canvas.restore();
 	}
 	
