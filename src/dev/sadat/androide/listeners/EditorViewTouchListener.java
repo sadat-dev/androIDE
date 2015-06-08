@@ -1,7 +1,5 @@
 package dev.sadat.androide.listeners;
 
-import android.text.method.MovementMethod;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;

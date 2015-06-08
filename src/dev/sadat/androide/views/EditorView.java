@@ -1,19 +1,16 @@
 package dev.sadat.androide.views;
 
-import java.util.Arrays;
-
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.os.Handler;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import dev.sadat.androide.listeners.EditorTouchCallback;
 import dev.sadat.androide.listeners.EditorViewTouchListener;
+import dev.sadat.androide.views.blocks.Variable;
 
 public class EditorView extends View implements EditorTouchCallback{
 
@@ -34,6 +31,7 @@ public class EditorView extends View implements EditorTouchCallback{
 	
 	private float [] delta;
 	
+	private Variable debug;
 	
 	public EditorView(Context context) {
 		this(context, null, 0);
@@ -50,8 +48,11 @@ public class EditorView extends View implements EditorTouchCallback{
 		listener.setTouchCallback(this);
 		this.setOnTouchListener(listener);
 		delta = new float[]{0,0};
+		
+		debug = new Variable(20, 20, "String", "testVar", "This is a test");
 	}
 	
+	@SuppressLint("WrongCall")
 	@Override
 	protected void onDraw(Canvas canvas) {
 		// Call Initialization only once
@@ -61,7 +62,8 @@ public class EditorView extends View implements EditorTouchCallback{
 		drawGridLines(canvas);
 		canvas.save();
 		canvas.translate(delta[0], delta[1]);
-		canvas.drawCircle(50, 50, 100, gridLinePaint);
+		// TODO Code Block Drawing
+		debug.onDraw(canvas);
 		canvas.restore();
 	}
 	
