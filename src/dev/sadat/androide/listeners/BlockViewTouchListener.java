@@ -5,23 +5,29 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import dev.sadat.androide.views.EditorView;
 
-public class EditorViewTouchListener implements OnTouchListener {
+public class BlockViewTouchListener implements OnTouchListener {
 
+	private BlockTouchCallback listener;
+	private static final float DELTA_THRESHOLD = 0.2f;
 	private float prevX;
 	private float prevY;
 	private float currX;
 	private float currY;
-
-	private static final float DELTA_THRESHOLD = 0.2f;
-
-	private EditorTouchCallback callback;
-
-	public void setTouchCallback(EditorTouchCallback callback) {
-		this.callback = callback;
+	
+	public BlockViewTouchListener(){
 	}
-
+	
+	public void setTouchCallback(BlockTouchCallback callback) {
+		this.listener = callback;
+	}
+	
 	@Override
 	public boolean onTouch(View view, MotionEvent evt) {
+		if (!(view instanceof EditorView)) {
+			boolean handled = view.onTouchEvent(evt);
+			if (handled)
+				return true;
+		}
 		int numPointers = evt.getPointerCount();
 		if (numPointers < 2) {
 			return handleSinglePointers(evt);
@@ -62,7 +68,7 @@ public class EditorViewTouchListener implements OnTouchListener {
 		prevX = currX;
 		prevY = currY;
 		
-		return callback.motionEvent(type, deltaX, deltaY);
+		return listener.onBlockTouched(type, deltaX, deltaY);
 	}
 
 }

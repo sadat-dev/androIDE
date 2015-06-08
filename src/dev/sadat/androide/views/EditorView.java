@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import dev.sadat.androide.listeners.EditorTouchCallback;
 import dev.sadat.androide.listeners.EditorViewTouchListener;
+import dev.sadat.androide.views.blocks.Block;
 
 public class EditorView extends View implements EditorTouchCallback{
 
@@ -29,6 +30,8 @@ public class EditorView extends View implements EditorTouchCallback{
 	private Paint gridLinePaint;
 	
 	private float [] delta;
+	
+	private Block[] debug;
 	
 	public EditorView(Context context) {
 		this(context, null, 0);
@@ -58,6 +61,8 @@ public class EditorView extends View implements EditorTouchCallback{
 		canvas.save();
 		canvas.translate(delta[0], delta[1]);
 		// TODO Code Block Drawing
+		for (Block deb:debug)
+			deb.draw(canvas);
 		canvas.restore();
 	}
 	
@@ -75,6 +80,12 @@ public class EditorView extends View implements EditorTouchCallback{
 		backgroundPaint.setStyle(Paint.Style.FILL);
 		setGridLineConfig();
 		isInit = true;
+		
+		debug = new Block[10];
+		
+		for (int i=0; i< 10; i++){
+			debug[i] = new Block(context, 20*i, 20);
+		}
 	}
 	
 	private void setGridLineConfig(){
