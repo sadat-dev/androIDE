@@ -21,11 +21,11 @@ public class EditorViewTouchListener implements OnTouchListener {
 
 	@Override
 	public boolean onTouch(View view, MotionEvent evt) {
+		Log.w("EditorViewTouchListener.onTouch", "Called Touch");
 		if (!(view instanceof EditorView)){
 			view.onTouchEvent(evt);
 			return true;
 		}
-		Log.w("EditorViewTouchListener.onTouch", view.getClass().getSimpleName());
 		
 		int numPointers = evt.getPointerCount();
 		if (numPointers < 2) {
@@ -37,6 +37,10 @@ public class EditorViewTouchListener implements OnTouchListener {
 	}
 
 	private boolean handleSinglePointers(MotionEvent evt) {
+		if (callback.getCurrentFocus() != null){
+			return callback.getCurrentFocus().callOnClick();
+		}
+		
 		currX = evt.getX(0);
 		currY = evt.getY(0);
 

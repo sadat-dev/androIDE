@@ -23,7 +23,6 @@ public class BlockViewTouchListener implements OnTouchListener {
 	
 	@Override
 	public boolean onTouch(View view, MotionEvent evt) {
-		Log.w("BlockViewTouchListener.onTouch", view.getClass().getSimpleName());
 		int numPointers = evt.getPointerCount();
 		if (numPointers < 2) {
 			return handleSinglePointers(evt);
@@ -49,6 +48,7 @@ public class BlockViewTouchListener implements OnTouchListener {
 			type = EditorTouchCallback.UNTOUCH;
 			break;
 		case MotionEvent.ACTION_MOVE:
+			Log.w("BlockViewTouchListener.handleSinglePointers", "Inside Move");
 			type = EditorTouchCallback.TOUCH;
 			break;
 		}
@@ -56,6 +56,8 @@ public class BlockViewTouchListener implements OnTouchListener {
 		float deltaX = currX - prevX;
 		float deltaY = currY - prevY;
 
+		Log.w("BlockViewTouchListener.handleSinglePointers", deltaX +" "+deltaY);
+		
 		if ((deltaX < DELTA_THRESHOLD || deltaX > DELTA_THRESHOLD) && type == EditorTouchCallback.TOUCH)
 			type = EditorTouchCallback.SCROLL;
 		else if ((deltaY < DELTA_THRESHOLD || deltaY > DELTA_THRESHOLD) && type == EditorTouchCallback.TOUCH)
