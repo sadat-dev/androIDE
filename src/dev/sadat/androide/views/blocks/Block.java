@@ -9,8 +9,10 @@ import android.util.AttributeSet;
 import android.view.View;
 import dev.sadat.androide.listeners.EditorTouchCallback;
 
-public class Block extends View{
+public class Block{
 
+	private Context context;
+	
 	private boolean isInit = false;
 
 	private static int PADDING = 16;
@@ -28,24 +30,16 @@ public class Block extends View{
 	private int textSize = 32;
 
 	public Block(Context context, float x, float y) {
-		this(context, null, 0, x, y);
+		this.position = new float[] { x, y };
+		this.context = context;
 	}
 
 	public Block(Context context) {
-		this(context, null, 0, 0, 0);
+		this(context, 0, 0);
 	}
 
-	public Block(Context context, AttributeSet attrs) {
-		this(context, attrs, 0, 0, 0);
-	}
 
-	public Block(Context context, AttributeSet attrs, int defStyleAttr, float x, float y) {
-		super(context, attrs, defStyleAttr);
-		this.position = new float[] { x, y };
-	}
-
-	@Override
-	protected void onDraw(Canvas canvas) {
+	public void draw(Canvas canvas) {
 		if (isInit == false)
 			initialize(canvas);
 		canvas.save();
@@ -57,6 +51,8 @@ public class Block extends View{
 		canvas.restore();
 	}
 
+	// TODO Move these initializations to a global layer so that number of instances becomes 
+	// constant instead of n
 	protected void initialize(Canvas canvas) {
 		backPaint = new Paint();
 		headPaint = new Paint();
