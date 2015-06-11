@@ -6,15 +6,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
-import dev.sadat.androide.listeners.BlockTouchCallback;
-import dev.sadat.androide.listeners.BlockViewTouchListener;
 import dev.sadat.androide.listeners.EditorTouchCallback;
 
-public class Block extends View implements BlockTouchCallback{
+public class Block extends View{
 
-	private Context context;
 	private boolean isInit = false;
 
 	private static int PADDING = 16;
@@ -45,11 +41,7 @@ public class Block extends View implements BlockTouchCallback{
 
 	public Block(Context context, AttributeSet attrs, int defStyleAttr, float x, float y) {
 		super(context, attrs, defStyleAttr);
-		this.context = context;
 		this.position = new float[] { x, y };
-		BlockViewTouchListener listener = new BlockViewTouchListener();
-		listener.setTouchCallback(this);
-		this.setOnTouchListener(listener);
 	}
 
 	@Override
@@ -80,20 +72,16 @@ public class Block extends View implements BlockTouchCallback{
 		backBlock = new Rect(0, 0, textRight + PADDING * 2, textSize * 4 + PADDING * 2);
 	}
 
-	@Override
 	public boolean onBlockTouched(int type, float deltaX, float deltaY) {
-		Log.w("Block.onBlockTouched", deltaX + ", " + deltaY+" "+type);
 		if (type == EditorTouchCallback.SCROLL){
 			position[0] += deltaX;
 			position[1] += deltaY;
-			getParent().invalidateChild(this, getClipBounds());
 			return true;
 		}
 		return true;
 	}
 	
-	@Override
-	public Rect getClipBounds() {
+	public Rect getBounds() {
 		Rect bound = new Rect((int)position[0], (int)position[1], (int)(backBlock.right+position[0]), (int)(backBlock.bottom+position[1]));
 		return bound;
 	}

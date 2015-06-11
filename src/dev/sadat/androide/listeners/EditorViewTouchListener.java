@@ -1,10 +1,8 @@
 package dev.sadat.androide.listeners;
 
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import dev.sadat.androide.views.EditorView;
 
 public class EditorViewTouchListener implements OnTouchListener {
 
@@ -12,6 +10,11 @@ public class EditorViewTouchListener implements OnTouchListener {
 	private float prevY;
 	private float currX;
 	private float currY;
+	
+	private float prevX1;
+	private float prevY1;
+	private float currX1;
+	private float currY1;
 
 	private EditorTouchCallback callback;
 
@@ -21,29 +24,18 @@ public class EditorViewTouchListener implements OnTouchListener {
 
 	@Override
 	public boolean onTouch(View view, MotionEvent evt) {
-		Log.w("EditorViewTouchListener.onTouch", "Called Touch");
-		if (!(view instanceof EditorView)){
-			view.onTouchEvent(evt);
-			return true;
-		}
-		
+		view.performClick();
 		int numPointers = evt.getPointerCount();
 		if (numPointers < 2) {
-			return handleSinglePointers(evt);
+			return handleSinglePointer(evt);
 		} else {
-			return false;
-			// return handleMultiPointers(evt);
+			 return handleMultiPointers(evt);
 		}
 	}
 
-	private boolean handleSinglePointers(MotionEvent evt) {
-		if (callback.getCurrentFocus() != null){
-			return callback.getCurrentFocus().callOnClick();
-		}
-		
+	private boolean handleSinglePointer(MotionEvent evt) {
 		currX = evt.getX(0);
 		currY = evt.getY(0);
-
 		int type = EditorTouchCallback.NO_ACTION;
 
 		switch (evt.getActionMasked()) {
@@ -54,6 +46,8 @@ public class EditorViewTouchListener implements OnTouchListener {
 			break;
 		case MotionEvent.ACTION_UP:
 			type = EditorTouchCallback.UNTOUCH;
+			prevX = currX;
+			prevY = currY;
 			break;
 		case MotionEvent.ACTION_MOVE:
 			type = EditorTouchCallback.SCROLL;
@@ -66,7 +60,41 @@ public class EditorViewTouchListener implements OnTouchListener {
 		prevX = currX;
 		prevY = currY;
 		
-		return callback.motionEvent(type, deltaX, deltaY);
+		return callback.motionEvent(type, deltaX, deltaY, new float[]{currX, currY});
 	}
 
+	private boolean handleMultiPointers(MotionEvent evt){
+		currX = evt.getX(0);
+		currY = evt.getY(0);
+		currX1 = evt.getX(1);
+		currY1 = evt.getY(1);
+		int type = EditorTouchCallback.NO_ACTION;
+		
+		float deltaX = 0;
+		
+		if (evt.getPointerCount() == 2){
+			
+			switch (evt.getActionMasked()) {
+			case MotionEvent.ACTION_DOWN:
+				type = EditorTouchCallback.TOUCH;
+				break;
+			case MotionEvent.ACTION_UP:
+				type = EditorTouchCallback.UNTOUCH;
+				deltaX = 0;
+				break;
+			case MotionEvent.ACTION_MOVE:
+				type = EditorTouchCallback.ZOOM;
+				deltaX = (currX - currX1)+(currY - currY1);
+				deltaX *= deltaX;
+				deltaX = (float) Math.sqrt(deltaX);
+				break;
+			}
+		}
+		
+		prevX = currX;
+		prevY = currY;
+		prevX1 = currX1;
+		prevY1 = currY1;
+		return callback.motionEvent(type, deltaX, 0, new float[]{0,0});
+	}
 }

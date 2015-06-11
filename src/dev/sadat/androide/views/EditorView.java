@@ -1,25 +1,18 @@
 package dev.sadat.androide.views;
 
 import java.util.ArrayList;
-
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import dev.sadat.androide.listeners.EditorTouchCallback;
 import dev.sadat.androide.listeners.EditorViewTouchListener;
 import dev.sadat.androide.views.blocks.Block;
 
-public class EditorView extends ViewGroup implements EditorTouchCallback {
-
-	private Context context;
+public class EditorView extends View implements EditorTouchCallback {
 
 	private boolean isInit = false;
 
@@ -33,10 +26,11 @@ public class EditorView extends ViewGroup implements EditorTouchCallback {
 	private Paint gridLinePaint;
 
 	private float[] delta;
-	
-	private View currentFocus = null;
+	private float zoomLevel = 1;
 
-	private ArrayList<View> debug;
+	private boolean isInsideChild = false;
+	private int childIndex = -1;
+	private ArrayList<Block> debug;
 
 	private EditorViewTouchListener listener;
 
@@ -47,10 +41,9 @@ public class EditorView extends ViewGroup implements EditorTouchCallback {
 	public EditorView(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
-
+	
 	public EditorView(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
-		this.context = context;
 		listener = new EditorViewTouchListener();
 		listener.setTouchCallback(this);
 		this.setOnTouchListener(listener);
@@ -58,6 +51,11 @@ public class EditorView extends ViewGroup implements EditorTouchCallback {
 		this.setWillNotDraw(false);
 	}
 
+	@Override
+	public boolean performClick() {
+		return super.performClick();
+	}
+	
 	@Override
 	protected void onDraw(Canvas canvas) {
 		// Call Initialization only once
@@ -67,10 +65,12 @@ public class EditorView extends ViewGroup implements EditorTouchCallback {
 		drawGridLines(canvas);
 		canvas.save();
 		canvas.translate(delta[0], delta[1]);
+		canvas.scale(zoomLevel, zoomLevel);
 		// TODO Code Block Drawing
-		for (View deb : debug)
-			deb.draw(canvas);
-		canvas.restore();
+		for (int i=debug.size()-1; i>=0;i--){
+			debug.get(i).draw(canvas);
+		}
+			canvas.restore();
 	}
 
 	private void drawGridLines(Canvas canvas) {
@@ -88,13 +88,13 @@ public class EditorView extends ViewGroup implements EditorTouchCallback {
 		setGridLineConfig();
 		isInit = true;
 
-		debug = new ArrayList<View>();
+		debug = new ArrayList<Block>();
 
-		for (int i = 0; i < 2; i++) {
-			Block block = new Block(context, 100 * i, 50 * (i % 5));
+		for (int i = 0; i < 600; i++) {
+			Block block = new Block(super.getContext(), 100 * i, 50 * (i % 5));
 			debug.add(block);
-			this.addView(block);
 		}
+
 	}
 
 	private void setGridLineConfig() {
@@ -107,49 +107,45 @@ public class EditorView extends ViewGroup implements EditorTouchCallback {
 	}
 
 	@Override
-	public boolean motionEvent(int type, float deltaX, float deltaY) {
-		if (type == EditorTouchCallback.SCROLL) {
+	public boolean motionEvent(int type, float deltaX, float deltaY, float[] coord) {
+		coord[0] -= delta[0];
+		coord[1] -= delta[1];
+		if (childIndex == -1) {
+			for (Block v : debug) {
+				Rect r = v.getBounds();
+				if (r.contains((int)coord[0], (int)coord[1])) {
+					isInsideChild = v.onBlockTouched(type, deltaX, deltaY);
+					childIndex = debug.indexOf(v);
+					invalidate();
+					if (isInsideChild = true) {
+						break;
+					}
+				}
+			}
+		} else if (childIndex > -1) {
+			debug.get(childIndex).onBlockTouched(type, deltaX, deltaY);
+			invalidate();
+		}
+		// Do Editor Events if Block Events are done
+		if (type == EditorTouchCallback.SCROLL && !isInsideChild) {
 			delta[0] += deltaX;
 			delta[1] += deltaY;
+			childIndex = -99;
 			invalidate();
-			return true;
+		}else if (type == EditorTouchCallback.ZOOM && !isInsideChild) {
+			zoomLevel = deltaX;
+			childIndex = -99;
+			invalidate();
 		}
+
+		// Move this to last
+		// Chain the actions together
+		if (type == EditorTouchCallback.UNTOUCH) {
+			isInsideChild = false;
+			childIndex = -1;
+		}
+
 		return true;
-	}
-
-	@SuppressLint("NewApi")
-	@Override
-	public boolean onInterceptTouchEvent(MotionEvent ev) {
-		Log.w("EditorView.onInterceptTouchEvent", "Called Intercept");
-		boolean res = false;
-		for (View v : debug) {
-			if (v.getClipBounds().contains((int)ev.getX(), (int)ev.getY())) {
-				currentFocus = v;
-				v.dispatchTouchEvent(ev);
-				return false;
-			}
-		}
-		currentFocus = null;
-		return true;
-	}
-
-	@SuppressLint("WrongCall")
-	@Override
-	protected void dispatchDraw(Canvas canvas) {
-		this.onDraw(canvas);
-	}
-
-	@Override
-	protected void onLayout(boolean changed, int l, int t, int r, int b) {
-		if (changed) {
-			this.layout(l, t, r, b);
-			this.invalidate();
-		}
-	}
-
-	@Override
-	public View getCurrentFocus() {
-		return currentFocus;
 	}
 
 }

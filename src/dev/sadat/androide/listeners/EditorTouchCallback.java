@@ -1,7 +1,5 @@
 package dev.sadat.androide.listeners;
 
-import android.view.View;
-
 public interface EditorTouchCallback {
 
 	public static final int NO_ACTION = 0;
@@ -9,9 +7,7 @@ public interface EditorTouchCallback {
 	public static final int SCROLL = 2;
 	public static final int TOUCH = 3;
 	public static final int UNTOUCH = 4;
-
-	public View getCurrentFocus();
 	
-	public boolean motionEvent(int type, float deltaX, float deltaY);
+	public boolean motionEvent(int type, float deltaX, float deltaY, float[]coords);
 
 }
