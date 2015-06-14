@@ -1,18 +1,15 @@
 package dev.sadat.androide.views.blocks;
 
-import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
-import android.util.AttributeSet;
-import android.view.View;
 import dev.sadat.androide.listeners.EditorTouchCallback;
+import dev.sadat.androide.views.CodeBlockPaints;
+import dev.sadat.androide.views.EditorView;
 
-public class Block{
+public class Block {
 
-	private Context context;
-	
+	private EditorView context;
+
 	private boolean isInit = false;
 
 	private static int PADDING = 16;
@@ -20,65 +17,75 @@ public class Block{
 	private float[] position = { 0, 0 };
 	private Rect backBlock;
 	private Rect headBlock;
-	private Paint headPaint;
-	private Paint backPaint;
-	private Paint textPaint;
+	private Rect typeIconBlock;
 
 	private String header = "default";
 	private String body = "default";
+	private int blockType = CodeBlockPaints.BOOLEAN;
 
-	private int textSize = 32;
-
-	public Block(Context context, float x, float y) {
+	public Block(EditorView context, float x, float y,int type) {
 		this.position = new float[] { x, y };
 		this.context = context;
+		if(type != 0)
+			this.blockType = type;
+	}
+	
+	public Block(EditorView context, float x, float y) {
+		this(context,0,0,0);
 	}
 
-	public Block(Context context) {
-		this(context, 0, 0);
+	public Block(EditorView context) {
+		this(context, 0, 0,0);
 	}
-
 
 	public void draw(Canvas canvas) {
 		if (isInit == false)
 			initialize(canvas);
 		canvas.save();
 		canvas.translate(position[0], position[1]);
-		canvas.drawRect(backBlock, backPaint);
-		canvas.drawRect(headBlock, headPaint);
-		canvas.drawText(header, PADDING, PADDING + textSize, textPaint);
-		canvas.drawText(body, PADDING, headBlock.height()+PADDING + textSize, textPaint);
+		canvas.drawRect(backBlock, context.getPaints().getBackground());
+		canvas.drawRect(headBlock, context.getPaints().getHeaderBack(blockType));
+		canvas.drawRect(typeIconBlock, context.getPaints().getHeaderText());
+		canvas.drawText(header, 0, context.getPaints().getHeaderText()
+				.getTextSize(), context.getPaints().getHeaderText());
+		canvas.drawText(body, 0, headBlock.height()
+				+ context.getPaints().getBodyText().getTextSize(), context
+				.getPaints().getBodyText());
 		canvas.restore();
 	}
 
-	// TODO Move these initializations to a global layer so that number of instances becomes 
+	// TODO Move these initializations to a global layer so that number of
+	// instances becomes
 	// constant instead of n
 	protected void initialize(Canvas canvas) {
-		backPaint = new Paint();
-		headPaint = new Paint();
-		textPaint = new Paint();
-		backPaint.setColor(Color.BLACK);
-		headPaint.setColor(Color.RED);
-		textPaint.setColor(Color.WHITE);
-		// TODO Make it adjustable from shared settings
-		textPaint.setTextSize(textSize);
-		int textRight = (int) Math.max(textPaint.measureText(header), textPaint.measureText(body));
+		int textRight = (int) Math.max(context.getPaints().getHeaderText()
+				.measureText(header), context.getPaints().getBodyText()
+				.measureText(body));
 		textRight += PADDING * 2;
-		headBlock = new Rect(0, 0, textRight + PADDING * 2, textSize + PADDING * 2);
-		backBlock = new Rect(0, 0, textRight + PADDING * 2, textSize * 4 + PADDING * 2);
+		headBlock = new Rect(0, 0, textRight, (int) context.getPaints()
+				.getHeaderText().getTextSize());
+		headBlock.inset(-PADDING, -PADDING);
+		backBlock = new Rect(0, 0, textRight, (int) context.getPaints()
+				.getBodyText().getTextSize() * 4);
+		backBlock.inset(-PADDING, -PADDING);
+		typeIconBlock = new Rect(headBlock);
+		typeIconBlock.inset(PADDING, PADDING);
+		typeIconBlock.left = 100;
 	}
 
 	public boolean onBlockTouched(int type, float deltaX, float deltaY) {
-		if (type == EditorTouchCallback.SCROLL){
+		if (type == EditorTouchCallback.SCROLL) {
 			position[0] += deltaX;
 			position[1] += deltaY;
 			return true;
 		}
 		return true;
 	}
-	
+
 	public Rect getBounds() {
-		Rect bound = new Rect((int)position[0], (int)position[1], (int)(backBlock.right+position[0]), (int)(backBlock.bottom+position[1]));
+		Rect bound = new Rect((int) position[0], (int) position[1],
+				(int) (backBlock.right + position[0]),
+				(int) (backBlock.bottom + position[1]));
 		return bound;
 	}
 }

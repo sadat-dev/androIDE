@@ -34,6 +34,8 @@ public class EditorView extends View implements EditorTouchCallback {
 
 	private EditorViewTouchListener listener;
 
+	private static CodeBlockPaints paints;
+	
 	public EditorView(Context context) {
 		this(context, null, 0);
 	}
@@ -88,10 +90,12 @@ public class EditorView extends View implements EditorTouchCallback {
 		setGridLineConfig();
 		isInit = true;
 
+		paints = new CodeBlockPaints();
+		
 		debug = new ArrayList<Block>();
 
 		for (int i = 0; i < 600; i++) {
-			Block block = new Block(super.getContext(), 100 * i, 50 * (i % 5));
+			Block block = new Block(this, 100 * i, 50 * (i % 5), (i%2==0)?paints.BOOLEAN:paints.STRING);
 			debug.add(block);
 		}
 
@@ -106,6 +110,10 @@ public class EditorView extends View implements EditorTouchCallback {
 		gridLinePaint.setStrokeWidth(gridWidth);
 	}
 
+	public CodeBlockPaints getPaints(){
+		return paints;
+	}
+	
 	@Override
 	public boolean motionEvent(int type, float deltaX, float deltaY, float[] coord) {
 		coord[0] -= delta[0];
