@@ -28,3 +28,6 @@ the IDE and should have full support for eclipse projects for Java atleast.
 
 Embedded compilers for compiling code in the device and finally, to add icing on top of
 the cake, should preferably run without root access to make it available to general users.
+
+### Open-Source Libraries Used
+* Eclipse JDT Core
