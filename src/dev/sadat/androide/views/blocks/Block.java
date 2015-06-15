@@ -8,69 +8,72 @@ import dev.sadat.androide.views.EditorView;
 
 public class Block {
 
-	private EditorView context;
+	private CodeBlockPaints context;
 
 	private boolean isInit = false;
 
 	private static int PADDING = 16;
 
 	private float[] position = { 0, 0 };
-	private Rect backBlock;
-	private Rect headBlock;
-	private Rect typeIconBlock;
+
+	private int[] bounds = { 0, 0};
 
 	private String header = "default";
 	private String body = "default";
 	private int blockType = CodeBlockPaints.BOOLEAN;
 
-	public Block(EditorView context, float x, float y,int type) {
+	public Block(CodeBlockPaints context, float x, float y, int type) {
 		this.position = new float[] { x, y };
 		this.context = context;
-		if(type != 0)
+		if (type != 0)
 			this.blockType = type;
 	}
-	
-	public Block(EditorView context, float x, float y) {
-		this(context,0,0,0);
+
+	public Block(CodeBlockPaints context, float x, float y) {
+		this(context, 0, 0, 0);
 	}
 
-	public Block(EditorView context) {
-		this(context, 0, 0,0);
+	public Block(CodeBlockPaints context) {
+		this(context, 0, 0, 0);
 	}
 
 	public void draw(Canvas canvas) {
 		if (isInit == false)
 			initialize(canvas);
+		
+
+		setupRects();
+		
 		canvas.save();
 		canvas.translate(position[0], position[1]);
-		canvas.drawRect(backBlock, context.getPaints().getBackground());
-		canvas.drawRect(headBlock, context.getPaints().getHeaderBack(blockType));
-		canvas.drawRect(typeIconBlock, context.getPaints().getHeaderText());
-		canvas.drawText(header, 0, context.getPaints().getHeaderText()
-				.getTextSize(), context.getPaints().getHeaderText());
-		canvas.drawText(body, 0, headBlock.height()
-				+ context.getPaints().getBodyText().getTextSize(), context
-				.getPaints().getBodyText());
+		canvas.drawRect(context.getBack(), context.getBackground());
+		canvas.drawRect(context.getHeader(), context.getHeaderBack(blockType));
+		canvas.drawRect(context.getIcon(), context.getHeaderText());
+		canvas.drawText(header, 0, context.getHeaderText().getTextSize(), context.getHeaderText());
+		canvas.drawText(body, 0, context.getHeader().height() + context.getBodyText().getTextSize(),
+				context.getBodyText());
 		canvas.restore();
+	}
+
+	private void setupRects() {
+		context.getHeader().set(0, 0, bounds[0], (int) context.getHeaderText().getTextSize());
+		context.getHeader().inset(-PADDING, -PADDING);
+		context.getBack().set(0, 0, bounds[0], (int) context.getBodyText().getTextSize() * 4);
+		context.getBack().inset(-PADDING, -PADDING);
+		context.getIcon().set(context.getHeader());
+		context.getIcon().inset(PADDING, PADDING);
+		context.getIcon().left = context.getIcon().right - context.getIcon().height();
 	}
 
 	// TODO Move these initializations to a global layer so that number of
 	// instances becomes
 	// constant instead of n
 	protected void initialize(Canvas canvas) {
-		int textRight = (int) Math.max(context.getPaints().getHeaderText()
-				.measureText(header), context.getPaints().getBodyText()
-				.measureText(body));
+		int textRight = (int) Math.max(context.getHeaderText().measureText(header),
+				context.getBodyText().measureText(body));
 		textRight += PADDING * 2;
-		headBlock = new Rect(0, 0, textRight, (int) context.getPaints()
-				.getHeaderText().getTextSize());
-		headBlock.inset(-PADDING, -PADDING);
-		backBlock = new Rect(0, 0, textRight, (int) context.getPaints()
-				.getBodyText().getTextSize() * 4);
-		backBlock.inset(-PADDING, -PADDING);
-		typeIconBlock = new Rect(headBlock);
-		typeIconBlock.inset(PADDING, PADDING);
-		typeIconBlock.left = 100;
+		bounds = new int[]{textRight, (int) context.getBodyText().getTextSize() * 4};
+		isInit = true;
 	}
 
 	public boolean onBlockTouched(int type, float deltaX, float deltaY) {
@@ -83,9 +86,8 @@ public class Block {
 	}
 
 	public Rect getBounds() {
-		Rect bound = new Rect((int) position[0], (int) position[1],
-				(int) (backBlock.right + position[0]),
-				(int) (backBlock.bottom + position[1]));
+		Rect bound = new Rect((int) position[0] - PADDING, (int) position[1] - PADDING, (int) (bounds[0] + position[0] + PADDING),
+				(int) (bounds[1] + position[1]) + PADDING);
 		return bound;
 	}
 }

@@ -36,6 +36,7 @@ public class EditorView extends View implements EditorTouchCallback {
 
 	private static CodeBlockPaints paints;
 	
+	
 	public EditorView(Context context) {
 		this(context, null, 0);
 	}
@@ -95,7 +96,7 @@ public class EditorView extends View implements EditorTouchCallback {
 		debug = new ArrayList<Block>();
 
 		for (int i = 0; i < 600; i++) {
-			Block block = new Block(this, 100 * i, 50 * (i % 5), (i%2==0)?paints.BOOLEAN:paints.STRING);
+			Block block = new Block(this.getPaints(), 100 * i, 50 * (i % 5), (i%2==0)?paints.BOOLEAN:paints.STRING);
 			debug.add(block);
 		}
 
@@ -111,6 +112,8 @@ public class EditorView extends View implements EditorTouchCallback {
 	}
 
 	public CodeBlockPaints getPaints(){
+		if (paints == null)
+			paints = new CodeBlockPaints();
 		return paints;
 	}
 	

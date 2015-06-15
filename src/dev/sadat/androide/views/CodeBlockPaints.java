@@ -2,6 +2,7 @@ package dev.sadat.androide.views;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 
 public class CodeBlockPaints {
 
@@ -14,6 +15,10 @@ public class CodeBlockPaints {
 	private static Paint backgroundPaint;
 	private static Paint headerText;
 	private static Paint bodyText;
+	
+	private Rect headerRect;
+	private Rect backRect;
+	private Rect iconRect;
 	
 	public CodeBlockPaints(){
 		createHeader();
@@ -28,6 +33,9 @@ public class CodeBlockPaints {
 		headerText.setColor(Color.BLACK);
 		headerText.setTextSize(textSize);
 		headerText.setStyle(Paint.Style.FILL_AND_STROKE);
+		
+		headerRect = new Rect();
+		iconRect = new Rect();
 	}
 	
 	private void createBody(){
@@ -38,6 +46,8 @@ public class CodeBlockPaints {
 		bodyText.setColor(Color.WHITE);
 		bodyText.setTextSize(textSize);
 		bodyText.setStyle(Paint.Style.FILL_AND_STROKE);
+		
+		backRect = new Rect();
 	}
 	
 	public Paint getHeaderBack(int type){
@@ -55,6 +65,18 @@ public class CodeBlockPaints {
 	
 	public Paint getBodyText(){
 		return bodyText;
+	}
+	
+	public Rect getHeader(){
+		return headerRect;
+	}
+	
+	public Rect getBack(){
+		return backRect;
+	}
+	
+	public Rect getIcon(){
+		return iconRect;
 	}
 	
 }
