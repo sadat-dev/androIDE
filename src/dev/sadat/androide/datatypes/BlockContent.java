@@ -1,8 +1,6 @@
 package dev.sadat.androide.datatypes;
 
-import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 public class BlockContent {
 
@@ -13,15 +11,18 @@ public class BlockContent {
 	
 	public BlockContent(ASTNode content){
 		this.content = content;
-		initialize();
-	}
-	
-	private void initialize(){
-		// TODO
 	}
 	
 	public int getType(){
 		return content.getNodeType();
+	}
+	
+	public void setHeader(String header){
+		this.header = header;
+	}
+	
+	public void setBody(String body){
+		this.body = body;
 	}
 	
 	public String getHeader(){
