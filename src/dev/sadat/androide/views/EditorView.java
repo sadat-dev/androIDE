@@ -138,6 +138,10 @@ public class EditorView extends View implements EditorTouchCallback {
 		return parser;
 	}
 
+	public ArrayList<Block> getBlocks(){
+		return debug;
+	}
+	
 	@Override
 	public boolean motionEvent(int type, float deltaX, float deltaY, float[] coord) {
 		coord[0] -= delta[0];
